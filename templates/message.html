@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | Scalping{% endblock %}
+{% block body %}
+<div class="page-center">
+  <div style="width:100%;max-width:420px;text-align:center">
+    <div class="card">
+      <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:var(--accent)">
+        {{ title }}
+      </h2>
+      <p class="text-muted" style="font-size:0.9rem;line-height:1.6">{{ message }}</p>
+      {% if show_login %}
+        <a class="btn btn-primary" href="{{ url_for('login') }}" style="margin-top:1.5rem;display:inline-flex">
+          Go to Login
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

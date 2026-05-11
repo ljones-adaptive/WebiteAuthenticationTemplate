@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Users | Scalping – Adaptive Realtime Trading{% endblock %}
+{% block head %}
+<style>
+  .users-table { width:100%; border-collapse:collapse; }
+  .users-table th {
+    text-align:left; padding:0.75rem 1rem;
+    font-size:0.75rem; text-transform:uppercase;
+    letter-spacing:0.5px; color:var(--muted);
+    border-bottom:1px solid var(--border);
+  }
+  .users-table td {
+    padding:0.75rem 1rem;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  .users-table tr:last-child td { border-bottom:none; }
+  .users-table tr:hover td { background:rgba(255,255,255,0.02); }
+  .badge {
+    display:inline-block;
+    padding:0.2rem 0.6rem;
+    border-radius:999px;
+    font-size:0.7rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+  }
+  .badge-active   { background:rgba(16,185,129,0.15); color:var(--success); }
+  .badge-suspended{ background:rgba(239,68,68,0.15);  color:var(--danger); }
+  .badge-pending  { background:rgba(245,158,11,0.15); color:var(--warn); }
+</style>
+{% endblock %}
+{% block body %}
+
+<div class="topbar">
+  <span class="topbar-title">Scalping | Adaptive Realtime Trading</span>
+  <div class="profile-menu">
+    <a class="profile-btn" href="{{ url_for('profile') }}" title="Profile">
+      {{ current_user.username[0].upper() }}
+    </a>
+    <div class="profile-dropdown">
+      <a href="{{ url_for('profile') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A9 9 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Profile
+      </a>
+      <a href="{{ url_for('landing') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8v8m5 0H5a2 2 0 01-2-2v-6"/></svg>
+        Home
+      </a>
+      <div class="dropdown-divider"></div>
+      <a href="{{ url_for('logout') }}" class="dropdown-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        Logout
+      </a>
+    </div>
+  </div>
+</div>
+
+<div style="padding:2rem">
+
+  <h2 style="font-size:1.1rem;font-weight:600;color:var(--accent);margin-bottom:1.5rem">
+    User Management
+  </h2>
+
+  <div class="card" style="overflow-x:auto;padding:0">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td style="font-weight:500">
+            {{ user.username }}
+            {% if user.id == current_user.id %}
+              <span class="text-muted" style="font-size:0.75rem">(you)</span>
+            {% endif %}
+          </td>
+          <td class="text-muted" style="font-size:0.875rem">{{ user.email }}</td>
+          <td>
+            {% if user.is_suspended %}
+              <span class="badge badge-suspended">Suspended</span>
+            {% elif not user.is_approved or not user.is_verified %}
+              <span class="badge badge-pending">Pending</span>
+            {% else %}
+              <span class="badge badge-active">Active</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if user.id == current_user.id %}
+              <span class="badge" style="background:var(--border);color:var(--text)">
+                {{ user.role.value }}
+              </span>
+            {% else %}
+              <form method="POST" action="{{ url_for('change_role', uid=user.id) }}"
+                    style="display:inline">
+                <select name="role" onchange="this.form.submit()">
+                  {% for r in Role %}
+                    <option value="{{ r.name }}"
+                      {% if user.role == r %}selected{% endif %}>
+                      {{ r.value.capitalize() }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </form>
+            {% endif %}
+          </td>
+          <td>
+            {% if user.id != current_user.id %}
+              <div class="flex gap1">
+                <form method="POST"
+                      action="{{ url_for('suspend_user', uid=user.id) }}"
+                      style="display:inline">
+                  <button class="btn btn-warn btn-sm" type="submit">
+                    {{ 'Unsuspend' if user.is_suspended else 'Suspend' }}
+                  </button>
+                </form>
+                <form method="POST"
+                      action="{{ url_for('admin_reset_password', uid=user.id) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Reset password for {{ user.username }}? Their account will be suspended until they set a new password.')">
+                  <button class="btn btn-ghost btn-sm" type="submit">Reset Password</button>
+                </form>
+                <form method="POST"
+                      action="{{ url_for('delete_user', uid=user.id) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Delete {{ user.username }}? This cannot be undone.')">
+                  <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            {% else %}
+              <span class="text-muted" style="font-size:0.8rem">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

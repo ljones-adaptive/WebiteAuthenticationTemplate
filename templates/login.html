@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Login | Scalping – Adaptive Realtime Trading{% endblock %}
+{% block body %}
+<div class="page-center">
+  <div style="width:100%;max-width:400px">
+
+    <div class="text-center" style="margin-bottom:2rem">
+      <h1 style="font-size:1.4rem;font-weight:700;color:var(--accent);letter-spacing:-0.3px">
+        Scalping
+      </h1>
+      <p class="text-muted" style="margin-top:0.25rem">Adaptive Realtime Trading</p>
+    </div>
+
+    <div class="card">
+
+      {% if error == 'suspended' %}
+        <div class="alert alert-error">Your account has been suspended.</div>
+      {% elif error == 'pending_approval' %}
+        <div class="alert alert-info">Your account is awaiting admin approval.</div>
+      {% elif error == 'pending_verification' %}
+        <div class="alert alert-info">Please verify your email before logging in.</div>
+      {% endif %}
+
+      <form method="POST">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="pw-toggle" title="Show password"></button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full mt2" type="submit">Log In</button>
+
+        <p class="text-center mt2" style="font-size:0.875rem;color:var(--muted)">
+          {% if error == 'invalid' %}
+            Forgotten
+            <a href="{{ url_for('forgot_username') }}">username</a>
+            or
+            <a href="{{ url_for('forgot_password') }}">password</a>
+          {% else %}
+            <a href="{{ url_for('register') }}">New user registration</a>
+          {% endif %}
+        </p>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

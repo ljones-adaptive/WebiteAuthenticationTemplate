@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Profile | Scalping – Adaptive Realtime Trading{% endblock %}
+{% block body %}
+
+<div class="topbar">
+  <span class="topbar-title">Scalping | Adaptive Realtime Trading</span>
+  <div class="profile-menu">
+    <a class="profile-btn" href="{{ url_for('profile') }}" title="Profile">
+      {{ current_user.username[0].upper() }}
+    </a>
+    <div class="profile-dropdown">
+      <a href="{{ url_for('landing') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8v8m5 0H5a2 2 0 01-2-2v-6"/></svg>
+        Home
+      </a>
+      {% if current_user.role.value == 'admin' %}
+      <a href="{{ url_for('admin_users') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87m6-4a4 4 0 11-8 0 4 4 0 018 0zm6 4a2 2 0 100-4 2 2 0 000 4zM3 16a2 2 0 100-4 2 2 0 000 4z"/></svg>
+        User Management
+      </a>
+      {% endif %}
+      <div class="dropdown-divider"></div>
+      <a href="{{ url_for('logout') }}" class="dropdown-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        Logout
+      </a>
+    </div>
+  </div>
+</div>
+
+<div style="padding:2rem;max-width:640px;margin:0 auto">
+
+  <!-- Identity -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--accent);
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:1.4rem;font-weight:700;color:#0a0e1a;flex-shrink:0">
+        {{ current_user.username[0].upper() }}
+      </div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:600">{{ current_user.username }}</div>
+        <div style="margin-top:0.25rem">
+          <span style="background:var(--border);padding:0.25rem 0.75rem;
+                       border-radius:999px;font-size:0.75rem;
+                       color:var(--accent);font-weight:600;text-transform:uppercase;
+                       letter-spacing:0.5px">
+            {{ current_user.role.value }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Email -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title">Change Email</div>
+    {% if email_error %}
+      <div class="alert alert-error">{{ email_error }}</div>
+    {% endif %}
+    {% if email_success %}
+      <div class="alert alert-success">{{ email_success }}</div>
+    {% endif %}
+    <p class="text-muted" style="margin-bottom:1rem;font-size:0.875rem">
+      Current: <strong style="color:var(--text)">{{ current_user.email }}</strong>
+    </p>
+    <form method="POST">
+      <input type="hidden" name="action" value="change_email">
+      <div class="form-group">
+        <label>New Email Address</label>
+        <input type="email" name="new_email" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Update Email</button>
+    </form>
+  </div>
+
+  <!-- Change Password -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title">Change Password</div>
+    {% if pw_error %}
+      <div class="alert alert-error">{{ pw_error }}</div>
+    {% endif %}
+    {% if pw_success %}
+      <div class="alert alert-success">{{ pw_success }}</div>
+    {% endif %}
+    <form method="POST">
+      <input type="hidden" name="action" value="change_password">
+      <div class="form-group">
+        <label>Current Password</label>
+        <div class="pw-wrap">
+          <input type="password" name="current_password" required>
+          <button type="button" class="pw-toggle" title="Show password"></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <div class="pw-wrap">
+          <input type="password" name="new_password" required>
+          <button type="button" class="pw-toggle" title="Show password"></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <div class="pw-wrap">
+          <input type="password" name="confirm_password" required>
+          <button type="button" class="pw-toggle" title="Show password"></button>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Update Password</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

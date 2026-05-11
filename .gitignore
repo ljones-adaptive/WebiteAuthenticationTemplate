@@ -1,0 +1,13 @@
+# Environment — never commit real credentials
+.env
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+*.egg-info/
+
+# Logs
+*.log
